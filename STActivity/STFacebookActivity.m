@@ -15,6 +15,7 @@ NSString *const UIActivityTypePostToFacebookCustom = @"UIActivityTypePostToFaceb
 @interface STFacebookActivity ()
 @property (strong, nonatomic) NSMutableArray * sharingImages;
 @property (strong, nonatomic) NSMutableString * sharingText;
+@property (strong, nonatomic) NSMutableArray *sharingUrls;
 @end
 
 @implementation STFacebookActivity
@@ -25,6 +26,7 @@ NSString *const UIActivityTypePostToFacebookCustom = @"UIActivityTypePostToFaceb
     if (self) {
         self.sharingText = [[NSMutableString alloc] init];
         self.sharingImages = [[NSMutableArray alloc] init];
+        self.sharingUrls = [[NSMutableArray alloc] init];
     }
     return self;
 }
@@ -55,7 +57,7 @@ NSString *const UIActivityTypePostToFacebookCustom = @"UIActivityTypePostToFaceb
 {
     for (UIActivityItemProvider * item in activityItems)
     {
-        if (![item isKindOfClass:[NSString class]] && ![item isKindOfClass:[UIImage class]])
+        if (![item isKindOfClass:[NSString class]] && ![item isKindOfClass:[UIImage class]] && ![item isKindOfClass:[NSURL class]])
         {
             return NO;
         }
@@ -75,6 +77,10 @@ NSString *const UIActivityTypePostToFacebookCustom = @"UIActivityTypePostToFaceb
         {
             [self.sharingText appendString:self.sharingText.length ? item : [NSString stringWithFormat:@"%@\n", item]];
         }
+        else if ([item isKindOfClass:[NSURL class]])
+        {
+            [self.sharingUrls addObject:item];
+        }
     }
 }
 
@@ -85,10 +91,12 @@ NSString *const UIActivityTypePostToFacebookCustom = @"UIActivityTypePostToFaceb
     for (UIImage * image in self.sharingImages) {
         [vc addImage:image];
     }
+    for (NSURL *url in self.sharingUrls) {
+        [vc addURL:url];
+    }
     [vc setCompletionHandler:^(SLComposeViewControllerResult result){
         [self activityDidFinish:result == SLComposeViewControllerResultDone];
      }];
     return vc;
 }
-
 @end

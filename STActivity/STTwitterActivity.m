@@ -53,22 +53,9 @@ NSString *const UIActivityTypePostToTwitterCustom = @"UIActivityTypePostToTwitte
 
 - (BOOL)canPerformWithActivityItems:(NSArray *)activityItems
 {
-    NSInteger countOfImages = 0;
     for (UIActivityItemProvider * item in activityItems)
     {
-        BOOL itemIsImage = NO;
-        BOOL itemIsString = NO;
-        if ([item isKindOfClass:[UIImage class]])
-        {
-            countOfImages += 1;
-            itemIsImage = YES;
-        }
-        else if ([item isKindOfClass:[NSString class]])
-        {
-            itemIsString = YES;
-        }
-
-        if ((!itemIsString && !itemIsImage) || countOfImages > 1)
+        if (![item isKindOfClass:[NSString class]] && ![item isKindOfClass:[UIImage class]] && ![item isKindOfClass:[NSURL class]])
         {
             return NO;
         }
@@ -88,6 +75,10 @@ NSString *const UIActivityTypePostToTwitterCustom = @"UIActivityTypePostToTwitte
         {
             [self.sharingText appendString:self.sharingText.length ? item : [NSString stringWithFormat:@"%@\n", item]];
         }
+        else if ([item isKindOfClass:[NSURL class]])
+        {
+            [self.sharingText appendString:self.sharingText.length ? [item absoluteString] : [NSString stringWithFormat:@"%@\n", [item absoluteString]]];
+        }
     }
 }
 
@@ -104,6 +95,4 @@ NSString *const UIActivityTypePostToTwitterCustom = @"UIActivityTypePostToTwitte
     }];
     return vc;
 }
-
-
 @end
